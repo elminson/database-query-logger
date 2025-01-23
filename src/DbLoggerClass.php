@@ -2,7 +2,4 @@
 
 namespace Elminson\DbLogger;
 
-class DbLoggerClass
-{
-
-}
+class DbLoggerClass {}
