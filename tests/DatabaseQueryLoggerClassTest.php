@@ -90,7 +90,7 @@ it('tests log_query with print = true and return = true', function () {
     ob_start();
     $result = '';
     try {
-        $result = log_query($query, [],true, true);
+        $result = log_query($query, [], true, true);
     } catch (Exception $e) {
         dd($e->getMessage());
     }
@@ -100,35 +100,35 @@ it('tests log_query with print = true and return = true', function () {
 });
 
 it('logs the PDOStatement query', function () {
-	// pass
-	return true;
-	// $logger = new DatabaseQueryLogger;
-	//
-	// // Get the PDO instance
-	// $pdo = DB::connection()->getPdo();
-	//
-	// // Set the PDO to use the custom statement wrapper class
-	// $pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS, [PDOStatementWrapper::class]);
-	//
-	// // Prepare the SQL statement
-	// $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');
-	//
-	// // Bind the parameter
-	// $email = 'example@example.com';
-	// $stmt->bindParam(':email', $email);
-	//
-	// // Execute the statement
-	// $stmt->execute();
-	//
-	// // Capture the output of the query logging
-	// $output = '';
-	// try {
-	// 	$output = $logger->logQuery($stmt, [':email' => $email]);
-	// } catch (Exception $e) {
-	// 	dd($e->getMessage());
-	//
-	// }
-	//
-	// // Check if the logged query contains the expected bound parameter
-	// expect($output)->toContain('SELECT * FROM users WHERE email = \'example@example.com\'');
+    // pass
+    return true;
+    // $logger = new DatabaseQueryLogger;
+    //
+    // // Get the PDO instance
+    // $pdo = DB::connection()->getPdo();
+    //
+    // // Set the PDO to use the custom statement wrapper class
+    // $pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS, [PDOStatementWrapper::class]);
+    //
+    // // Prepare the SQL statement
+    // $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');
+    //
+    // // Bind the parameter
+    // $email = 'example@example.com';
+    // $stmt->bindParam(':email', $email);
+    //
+    // // Execute the statement
+    // $stmt->execute();
+    //
+    // // Capture the output of the query logging
+    // $output = '';
+    // try {
+    // 	$output = $logger->logQuery($stmt, [':email' => $email]);
+    // } catch (Exception $e) {
+    // 	dd($e->getMessage());
+    //
+    // }
+    //
+    // // Check if the logged query contains the expected bound parameter
+    // expect($output)->toContain('SELECT * FROM users WHERE email = \'example@example.com\'');
 });
