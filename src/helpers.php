@@ -11,11 +11,11 @@ if (! function_exists('log_query')) {
      *
      * @throws Exception
      */
-    function log_query(mixed $query, bool $print = false, bool $return = false)
+    function log_query(mixed $query, $bindings = [], bool $print = false, bool $return = false)
     {
 
         $logger = new DatabaseQueryLogger;
-        $sql = $logger->logQuery($query);
+        $sql = $logger->logQuery($query, $bindings);
 
         if ($print) {
             echo $sql;
