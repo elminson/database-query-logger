@@ -25,6 +25,16 @@ beforeEach(function () {
     DB::table('users')->insert([
         'email' => 'example@example.com',
     ]);
+	// Create a PDO connection with SQLite in-memory database
+	$this->pdo = new PDO('sqlite::memory:');
+	$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$this->pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS, [PDOStatementWrapper::class]);
+
+	// Create test table
+	$this->pdo->exec('CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT, active BOOLEAN, score REAL)');
+
+	// Create logger instance
+	$this->logger = new DatabaseQueryLogger();
 });
 
 it('dumps the SQL query with print = false and return = false', function () {
@@ -99,36 +109,91 @@ it('tests log_query with print = true and return = true', function () {
     expect($result)->toBe('Query Builder SQL: select * from "users" where "email" = \'example@example.com\'');
 });
 
-it('logs the PDOStatement query', function () {
-	// pass
-	return true;
-	// $logger = new DatabaseQueryLogger;
-	//
-	// // Get the PDO instance
-	// $pdo = DB::connection()->getPdo();
-	//
-	// // Set the PDO to use the custom statement wrapper class
-	// $pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS, [PDOStatementWrapper::class]);
-	//
-	// // Prepare the SQL statement
-	// $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');
-	//
-	// // Bind the parameter
-	// $email = 'example@example.com';
-	// $stmt->bindParam(':email', $email);
-	//
-	// // Execute the statement
-	// $stmt->execute();
-	//
-	// // Capture the output of the query logging
-	// $output = '';
-	// try {
-	// 	$output = $logger->logQuery($stmt, [':email' => $email]);
-	// } catch (Exception $e) {
-	// 	dd($e->getMessage());
-	//
-	// }
-	//
-	// // Check if the logged query contains the expected bound parameter
-	// expect($output)->toContain('SELECT * FROM users WHERE email = \'example@example.com\'');
+test('logs PDO statement query with bound parameters', function () {
+	// Prepare the statement
+	$stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = :email');
+
+	// Bind parameter
+	$email = 'example@example.com';
+	$stmt->bindParam(':email', $email);
+
+	// Get logged query
+	$output = $this->logger->logQuery($stmt, [':email' => $email]);
+
+	// Assert the output contains the properly formatted query
+	expect($output)
+		->toBeString()
+		->toContain("SELECT * FROM users WHERE email = 'example@example.com'");
+});
+
+test('handles multiple bound parameters in PDO statement', function () {
+	// Prepare statement with multiple parameters
+	$stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = :email AND id = :id');
+
+	// Bind multiple parameters
+	$email = 'test@example.com';
+	$id = 1;
+	$stmt->bindParam(':email', $email);
+	$stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+	// Get logged query
+	$output = $this->logger->logQuery($stmt, [':email' => $email, ':id' => $id]);
+
+	// Assert the output contains all bound parameters
+	expect($output)
+		->toBeString()
+		->toContain("SELECT * FROM users WHERE email = 'test@example.com' AND id = '1'");
+});
+
+// test('throws exception for invalid PDO statement', function () {
+// 	// Create an invalid statement (table doesn't exist)
+// 	$stmt = $this->pdo->prepare('SELECT * FROM nonexistent_table WHERE id = :id');
+// 	$id = 1;
+// 	$stmt->bindParam(':id', $id);
+//
+// 	// Expect a PDOException to be thrown
+// 	$this->expectException(PDOException::class);
+// 	$this->expectExceptionMessage('no such table: nonexistent_table');
+//
+// 	// Execute the statement
+// 	$stmt->execute();
+// });
+
+test('handles different parameter types correctly', function () {
+	// Prepare statement with different parameter types
+	$stmt = $this->pdo->prepare('
+        SELECT * FROM users
+        WHERE id = :id
+        AND email = :email
+        AND active = :active
+        AND score = :score
+    ');
+
+	// Bind different types of parameters
+	$id = 123;
+	$email = 'test@example.com';
+	$active = true;
+	$score = 95.5;
+
+	$stmt->bindParam(':id', $id, PDO::PARAM_INT);
+	$stmt->bindParam(':email', $email, PDO::PARAM_STR);
+	$stmt->bindParam(':active', $active, PDO::PARAM_BOOL);
+	$stmt->bindParam(':score', $score, PDO::PARAM_STR);
+
+	// Get logged query
+	$params = [
+		':id' => $id,
+		':email' => $email,
+		':active' => $active,
+		':score' => $score
+	];
+	$output = $this->logger->logQuery($stmt, $params);
+
+	// Assert the output contains all bound parameters
+	expect($output)
+		->toBeString()
+		->toContain("id = '123'")
+		->toContain("email = 'test@example.com'")
+		->toContain("active = '1'")
+		->toContain("score = '95.5'");
 });
