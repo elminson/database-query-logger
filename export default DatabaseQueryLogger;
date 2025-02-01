@@ -1,0 +1,11 @@
+
+This solution:
+
+1. Creates a `QueryBuilder` class that handles different database types through driver configuration
+2. Adds proper query building with SELECT and WHERE clauses
+3. Implements a mock database connection for testing purposes
+4. Provides async/await support for executing queries
+5. Includes proper error handling
+
+To use this with Pest, you would do something like:
+
