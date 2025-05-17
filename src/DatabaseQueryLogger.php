@@ -11,8 +11,11 @@ use PDOStatement;
 class DatabaseQueryLogger
 {
     private ?string $logFile = null;
+
     private bool $consoleOutput = false;
+
     private bool $enabled = false;
+
     private bool $fileLogging = false;
 
     public function __construct(array $config = [])
@@ -20,7 +23,7 @@ class DatabaseQueryLogger
         $this->enabled = $config['enabled'] ?? false;
         $this->consoleOutput = $config['console_output'] ?? false;
         $this->fileLogging = $config['file_logging'] ?? false;
-        
+
         if ($this->fileLogging) {
             $this->logFile = $config['log_file'] ?? null;
         }
@@ -29,52 +32,50 @@ class DatabaseQueryLogger
     /**
      * Set the log file path for query logging.
      *
-     * @param string|null $filePath
      * @return $this
      */
     public function setLogFile(?string $filePath): self
     {
         $this->logFile = $filePath;
         $this->fileLogging = $filePath !== null;
+
         return $this;
     }
 
     /**
      * Enable or disable console output for query logging.
      *
-     * @param bool $enable
      * @return $this
      */
     public function enableConsoleOutput(bool $enable = true): self
     {
         $this->consoleOutput = $enable;
+
         return $this;
     }
 
     /**
      * Enable or disable the logger completely.
      *
-     * @param bool $enable
      * @return $this
      */
     public function enable(bool $enable = true): self
     {
         $this->enabled = $enable;
+
         return $this;
     }
 
     /**
      * Log SQL queries for both Query Builder and raw PDO statements.
      *
-     * @param Builder|QueryBuilder|PDOStatement|string $query
-     * @param array $bindings
-     * @param ConnectionInterface|null $connection
-     * @return string
+     * @param  Builder|QueryBuilder|PDOStatement|string  $query
+     *
      * @throws \Exception
      */
     public function logQuery($query, array $bindings = [], ?ConnectionInterface $connection = null): string
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return '';
         }
 
@@ -99,14 +100,11 @@ class DatabaseQueryLogger
 
     /**
      * Write the query to the configured output(s).
-     *
-     * @param string $query
-     * @return void
      */
     private function writeLog(string $query): void
     {
         $timestamp = date('Y-m-d H:i:s');
-        $logEntry = "[{$timestamp}] {$query}" . PHP_EOL;
+        $logEntry = "[{$timestamp}] {$query}".PHP_EOL;
 
         if ($this->consoleOutput) {
             echo $logEntry;
@@ -114,7 +112,7 @@ class DatabaseQueryLogger
 
         if ($this->fileLogging && $this->logFile !== null) {
             $directory = dirname($this->logFile);
-            if (!is_dir($directory)) {
+            if (! is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }
             file_put_contents($this->logFile, $logEntry, FILE_APPEND);
@@ -130,6 +128,7 @@ class DatabaseQueryLogger
         $bindings = $query->getBindings();
         $formattedQuery = $this->formatQuery($sql, $bindings);
         $this->writeLog($formattedQuery);
+
         return $formattedQuery;
     }
 
@@ -141,6 +140,7 @@ class DatabaseQueryLogger
         $query = $stmt->queryString;
         $formattedQuery = $this->formatQuery($query, $bindings);
         $this->writeLog($formattedQuery);
+
         return $formattedQuery;
     }
 
@@ -151,6 +151,7 @@ class DatabaseQueryLogger
     {
         $formattedQuery = $this->formatQuery($sql, $bindings);
         $this->writeLog($formattedQuery);
+
         return $formattedQuery;
     }
 
