@@ -49,6 +49,12 @@ Register the service provider in `config/app.php`:
 ],
 ```
 
+To publish the configuration file, run:
+
+```bash
+cp vendor/elminson/db-logger/src/config/database-logger.php config/db-logger.php
+```
+
 ## Usage
 
 ### Basic Usage
@@ -130,3 +136,27 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+
+## Log All Queries in Laravel
+
+To log every SQL query executed by your Laravel application, add the following to your `app/Providers/AppServiceProvider.php`:
+
+```php
+use Illuminate\Support\Facades\DB;
+use Elminson\DQL\DatabaseQueryLogger;
+
+public function boot()
+{
+    $logger = new DatabaseQueryLogger(config('db-logger'));
+
+    DB::listen(function ($query) use ($logger) {
+        $logger->logQuery(
+            $query->sql,
+            $query->bindings,
+            $query->connection
+        );
+    });
+}
+```
+
+Make sure your `config/db-logger.php` and `.env` are set up as described above. This will ensure all queries are logged according to your configuration.
