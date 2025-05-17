@@ -23,7 +23,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Elminson\\DQL\\": "src/"
+            "Elminson\\DbLogger\\": "src/"
         },
         "files": [
             "src/helpers.php"
@@ -31,7 +31,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Elminson\\DQL\\Tests\\": "tests/"
+            "Elminson\\DbLogger\\Tests\\": "tests/"
         }
     },
     "scripts": {
