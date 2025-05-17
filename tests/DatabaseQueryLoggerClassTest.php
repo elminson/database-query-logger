@@ -49,7 +49,7 @@ beforeEach(function () {
 it('logs query with console output disabled', function () {
     $logger = new DatabaseQueryLogger([
         'enabled' => true,
-        'console_output' => false
+        'console_output' => false,
     ]);
     $query = DB::table('users')->where('email', 'example@example.com');
 
@@ -61,7 +61,7 @@ it('logs query with console output disabled', function () {
 it('logs query with console output enabled', function () {
     $logger = new DatabaseQueryLogger([
         'enabled' => true,
-        'console_output' => true
+        'console_output' => true,
     ]);
     $query = DB::table('users')->where('email', 'example@example.com');
 
@@ -74,16 +74,16 @@ it('logs query with console output enabled', function () {
 });
 
 it('logs query with file logging', function () {
-    $logFile = sys_get_temp_dir() . '/test-query.log';
+    $logFile = sys_get_temp_dir().'/test-query.log';
     $logger = new DatabaseQueryLogger([
         'enabled' => true,
         'file_logging' => true,
-        'log_file' => $logFile
+        'log_file' => $logFile,
     ]);
     $query = DB::table('users')->where('email', 'example@example.com');
 
     $result = $logger->logQuery($query);
-    
+
     expect($result)->toContain('select * from "users" where "email" = \'example@example.com\'');
     expect(file_exists($logFile))->toBeTrue();
     expect(file_get_contents($logFile))->toContain('select * from "users" where "email" = \'example@example.com\'');
@@ -93,12 +93,12 @@ it('logs query with file logging', function () {
 });
 
 it('logs query with both console and file output', function () {
-    $logFile = sys_get_temp_dir() . '/test-query.log';
+    $logFile = sys_get_temp_dir().'/test-query.log';
     $logger = new DatabaseQueryLogger([
         'enabled' => true,
         'console_output' => true,
         'file_logging' => true,
-        'log_file' => $logFile
+        'log_file' => $logFile,
     ]);
     $query = DB::table('users')->where('email', 'example@example.com');
 

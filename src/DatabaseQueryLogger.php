@@ -32,7 +32,6 @@ class DatabaseQueryLogger
     /**
      * Set the log file path for query logging.
      *
-     * @param string|null $filePath
      * @return $this
      */
     public function setLogFile(?string $filePath): self
@@ -46,7 +45,6 @@ class DatabaseQueryLogger
     /**
      * Enable or disable console output for query logging.
      *
-     * @param bool $enable
      * @return $this
      */
     public function enableConsoleOutput(bool $enable = true): self
@@ -59,7 +57,6 @@ class DatabaseQueryLogger
     /**
      * Enable or disable the logger completely.
      *
-     * @param bool $enable
      * @return $this
      */
     public function enable(bool $enable = true): self
@@ -72,10 +69,9 @@ class DatabaseQueryLogger
     /**
      * Log SQL queries for both Query Builder and raw PDO statements.
      *
-     * @param Builder|QueryBuilder|PDOStatement|string $query
-     * @param array $bindings
-     * @param ConnectionInterface|null $connection
+     * @param  Builder|QueryBuilder|PDOStatement|string  $query
      * @return string The formatted SQL query
+     *
      * @throws \Exception
      */
     public function logQuery($query, array $bindings = [], ?ConnectionInterface $connection = null): string
@@ -145,6 +141,7 @@ class DatabaseQueryLogger
         $query = $stmt->queryString ?? '';
         if (empty($query)) {
             $this->writeLog('No query string available for this PDOStatement');
+
             return 'No query string available for this PDOStatement';
         }
 
@@ -180,14 +177,14 @@ class DatabaseQueryLogger
             return $sql;
         }
         // Debug: print SQL and bindings before replacement
-        file_put_contents('php://stderr', "FORMATQUERY BEFORE: sql=[$sql], bindings=" . var_export($bindings, true) . "\n");
+        file_put_contents('php://stderr', "FORMATQUERY BEFORE: sql=[$sql], bindings=".var_export($bindings, true)."\n");
 
         // If there are named parameters (e.g., :email), replace them
         if (preg_match('/:[a-zA-Z_][a-zA-Z0-9_]*/', $sql)) {
             foreach ($bindings as $key => $value) {
                 $replace = is_numeric($value) ? $value : (is_bool($value) ? ($value ? '1' : '0') : (is_null($value) ? 'NULL' : "'{$value}'"));
                 // Ensure the key starts with a colon
-                $param = (str_starts_with($key, ':')) ? $key : (':' . $key);
+                $param = (str_starts_with($key, ':')) ? $key : (':'.$key);
                 $sql = str_replace($param, $replace, $sql);
             }
             // Normalize whitespace
@@ -195,6 +192,7 @@ class DatabaseQueryLogger
             $sql = trim($sql);
             // Debug: print SQL after replacement
             file_put_contents('php://stderr', "FORMATQUERY AFTER: sql=[$sql]\n");
+
             return $sql;
         }
 
@@ -209,6 +207,7 @@ class DatabaseQueryLogger
             if (is_null($binding)) {
                 return 'NULL';
             }
+
             return "'{$binding}'";
         }, $bindings);
 
@@ -218,6 +217,7 @@ class DatabaseQueryLogger
         $sql = trim($sql);
         // Debug: print SQL after replacement
         file_put_contents('php://stderr', "FORMATQUERY AFTER: sql=[$sql]\n");
+
         return $sql;
     }
 }

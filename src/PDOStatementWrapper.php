@@ -9,6 +9,7 @@ use ReturnTypeWillChange;
 class PDOStatementWrapper extends PDOStatement
 {
     protected array $boundParams = [];
+
     protected array $paramTypes = [];
 
     protected function __construct() {}
