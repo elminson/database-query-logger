@@ -2,8 +2,11 @@
 // @codeCoverageIgnore
 
 use Elminson\DQL\DatabaseQueryLogger;
+use Elminson\DQL\PDOStatementWrapper;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
+use PDO;
+use PDOException;
 
 beforeEach(function () {
     // Set up the database connection
@@ -25,6 +28,17 @@ beforeEach(function () {
     DB::table('users')->insert([
         'email' => 'example@example.com',
     ]);
+
+    // Create a PDO connection with SQLite in-memory database
+    $this->pdo = new PDO('sqlite::memory:');
+    $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $this->pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS, [PDOStatementWrapper::class]);
+
+    // Create test table
+    $this->pdo->exec('CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT, active BOOLEAN, score REAL)');
+
+    // Create logger instance
+    $this->logger = new DatabaseQueryLogger;
 });
 
 it('logs query with console output disabled', function () {
@@ -97,4 +111,79 @@ it('logs query with both console and file output', function () {
 
     // Cleanup
     unlink($logFile);
+});
+
+test('logs PDO statement query with bound parameters', function () {
+    // Prepare the statement
+    $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = :email');
+
+    // Bind parameter
+    $email = 'example@example.com';
+    $stmt->bindParam(':email', $email);
+
+    // Get logged query
+    $output = $this->logger->logQuery($stmt, [':email' => $email]);
+
+    // Assert the output contains the properly formatted query
+    expect($output)
+        ->toBeString()
+        ->toContain("SELECT * FROM users WHERE email = 'example@example.com'");
+});
+
+test('handles multiple bound parameters in PDO statement', function () {
+    // Prepare statement with multiple parameters
+    $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = :email AND id = :id');
+
+    // Bind multiple parameters
+    $email = 'test@example.com';
+    $id = 1;
+    $stmt->bindParam(':email', $email);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+    // Get logged query
+    $output = $this->logger->logQuery($stmt, [':email' => $email, ':id' => $id]);
+
+    // Assert the output contains all bound parameters
+    expect($output)
+        ->toBeString()
+        ->toContain("SELECT * FROM users WHERE email = 'test@example.com' AND id = '1'");
+});
+
+test('handles different parameter types correctly', function () {
+    // Prepare statement with different parameter types
+    $stmt = $this->pdo->prepare('
+        SELECT * FROM users
+        WHERE id = :id
+        AND email = :email
+        AND active = :active
+        AND score = :score
+    ');
+
+    // Bind different types of parameters
+    $id = 123;
+    $email = 'test@example.com';
+    $active = true;
+    $score = 95.5;
+
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt->bindParam(':active', $active, PDO::PARAM_BOOL);
+    $stmt->bindParam(':score', $score, PDO::PARAM_STR);
+
+    // Get logged query
+    $params = [
+        ':id' => $id,
+        ':email' => $email,
+        ':active' => $active,
+        ':score' => $score,
+    ];
+    $output = $this->logger->logQuery($stmt, $params);
+
+    // Assert the output contains all bound parameters
+    expect($output)
+        ->toBeString()
+        ->toContain("id = '123'")
+        ->toContain("email = 'test@example.com'")
+        ->toContain("active = '1'")
+        ->toContain("score = '95.5'");
 });

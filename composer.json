@@ -1,17 +1,12 @@
 {
-    "name": "elminson/database-query-logger",
-    "description": "This is my package db-logger",
-    "keywords": [
-        "elminson",
-        "db-logger"
-    ],
-    "homepage": "https://github.com/elminson/db-logger",
+    "name": "elminson/db-logger",
+    "description": "A simple database query logger for Laravel applications",
+    "type": "library",
     "license": "MIT",
     "authors": [
         {
-            "name": "Elminson De Oleo Baez",
-            "email": "edeoleo@gmail.com",
-            "role": "Developer"
+            "name": "Elminson Deoleo",
+            "email": "edeoleo@gmail.com"
         }
     ],
     "require": {
@@ -27,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Elminson\\DQL\\": "src"
+            "Elminson\\DQL\\": "src/"
         },
         "files": [
             "src/helpers.php"
@@ -35,7 +30,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Elminson\\DQL\\Tests\\": "tests"
+            "Elminson\\DQL\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -44,12 +39,7 @@
         "format": "vendor/bin/pint"
     },
     "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true,
-            "phpstan/extension-installer": true
-        }
+        "sort-packages": true
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "minimum-stability": "stable"
 }
