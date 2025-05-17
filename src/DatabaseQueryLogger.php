@@ -26,6 +26,27 @@ class DatabaseQueryLogger
 
         if ($this->fileLogging) {
             $this->logFile = $config['log_file'] ?? null;
+            $this->ensureLogFileExists();
+        }
+    }
+
+    /**
+     * Ensure the log file and directory exist.
+     */
+    private function ensureLogFileExists(): void
+    {
+        if ($this->logFile === null) {
+            return;
+        }
+
+        $directory = dirname($this->logFile);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        if (!file_exists($this->logFile)) {
+            touch($this->logFile);
+            chmod($this->logFile, 0666);
         }
     }
 
