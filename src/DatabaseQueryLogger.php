@@ -70,6 +70,7 @@ class DatabaseQueryLogger
      * Log SQL queries for both Query Builder and raw PDO statements.
      *
      * @param  Builder|QueryBuilder|PDOStatement|string  $query
+     * @return string The formatted SQL query
      *
      * @throws \Exception
      */
@@ -137,7 +138,18 @@ class DatabaseQueryLogger
      */
     private function logPdoQuery(PDOStatement $stmt, array $bindings): string
     {
-        $query = $stmt->queryString;
+        $query = $stmt->queryString ?? '';
+        if (empty($query)) {
+            $this->writeLog('No query string available for this PDOStatement');
+
+            return 'No query string available for this PDOStatement';
+        }
+
+        // If we have a PDOStatementWrapper, use its bound parameters
+        if ($stmt instanceof PDOStatementWrapper) {
+            $bindings = $stmt->getBoundParams();
+        }
+
         $formattedQuery = $this->formatQuery($query, $bindings);
         $this->writeLog($formattedQuery);
 
@@ -160,8 +172,52 @@ class DatabaseQueryLogger
      */
     private function formatQuery(string $sql, array $bindings): string
     {
-        return vsprintf(str_replace('?', '%s', $sql), array_map(function ($binding) {
-            return is_numeric($binding) ? $binding : "'{$binding}'";
-        }, $bindings));
+        // If the SQL is the fallback message, just return it
+        if ($sql === 'No query string available for this PDOStatement') {
+            return $sql;
+        }
+        // Debug: print SQL and bindings before replacement
+        file_put_contents('php://stderr', "FORMATQUERY BEFORE: sql=[$sql], bindings=".var_export($bindings, true)."\n");
+
+        // If there are named parameters (e.g., :email), replace them
+        if (preg_match('/:[a-zA-Z_][a-zA-Z0-9_]*/', $sql)) {
+            foreach ($bindings as $key => $value) {
+                $replace = is_numeric($value) ? $value : (is_bool($value) ? ($value ? '1' : '0') : (is_null($value) ? 'NULL' : "'{$value}'"));
+                // Ensure the key starts with a colon
+                $param = (str_starts_with($key, ':')) ? $key : (':'.$key);
+                $sql = str_replace($param, $replace, $sql);
+            }
+            // Normalize whitespace
+            $sql = preg_replace('/\s+/', ' ', $sql);
+            $sql = trim($sql);
+            // Debug: print SQL after replacement
+            file_put_contents('php://stderr', "FORMATQUERY AFTER: sql=[$sql]\n");
+
+            return $sql;
+        }
+
+        // Otherwise, treat as positional
+        $formattedBindings = array_map(function ($binding) {
+            if (is_numeric($binding)) {
+                return $binding;
+            }
+            if (is_bool($binding)) {
+                return $binding ? '1' : '0';
+            }
+            if (is_null($binding)) {
+                return 'NULL';
+            }
+
+            return "'{$binding}'";
+        }, $bindings);
+
+        $sql = vsprintf(str_replace('?', '%s', $sql), $formattedBindings);
+        // Normalize whitespace
+        $sql = preg_replace('/\s+/', ' ', $sql);
+        $sql = trim($sql);
+        // Debug: print SQL after replacement
+        file_put_contents('php://stderr', "FORMATQUERY AFTER: sql=[$sql]\n");
+
+        return $sql;
     }
 }

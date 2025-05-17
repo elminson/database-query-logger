@@ -51,7 +51,7 @@ class HelpersTest extends TestCase
     public function test_log_query_with_query_bindings()
     {
         $query = $this->createMockQueryWithBindings();
-        $result = log_query($query, false, true);
+        $result = log_query($query, false, true, ['test@example.com']);
 
         $this->assertStringContainsString("SELECT * FROM users WHERE email = 'test@example.com'", $result);
     }
