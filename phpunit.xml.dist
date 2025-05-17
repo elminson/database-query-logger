@@ -34,5 +34,8 @@
         <include>
             <directory suffix=".php">./src</directory>
         </include>
+        <exclude>
+            <file>./src/config/database-logger.php</file>
+        </exclude>
     </source>
 </phpunit>

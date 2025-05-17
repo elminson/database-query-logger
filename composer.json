@@ -20,8 +20,9 @@
         "illuminate/support": "^10.0"
     },
     "require-dev": {
-        "pestphp/pest": "^3.0",
         "laravel/pint": "^1.0",
+        "mockery/mockery": "^1.6",
+        "pestphp/pest": "^3.0",
         "spatie/ray": "^1.28"
     },
     "autoload": {
@@ -34,12 +35,12 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Elminson\\DatabaseQueryLogger\\Tests\\": "tests"
+            "Elminson\\DQL\\Tests\\": "tests"
         }
     },
     "scripts": {
         "test": "vendor/bin/pest",
-            "test-coverage": "vendor/bin/pest --coverage",
+        "test-coverage": "vendor/bin/pest --coverage",
         "format": "vendor/bin/pint"
     },
     "config": {
