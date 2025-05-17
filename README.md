@@ -38,6 +38,14 @@ DB_LOGGER_FILE_LOGGING=true
 DB_LOGGER_FILE_PATH=storage/logs/queries.log
 ```
 
+### Manual Configuration
+
+Copy the configuration file to your Laravel project:
+
+```bash
+cp vendor/elminson/db-logger/src/config/database-logger.php config/db-logger.php
+```
+
 ### Service Provider
 
 Register the service provider in `config/app.php`:
@@ -47,12 +55,6 @@ Register the service provider in `config/app.php`:
     // ...
     Elminson\DQL\DatabaseQueryLoggerServiceProvider::class,
 ],
-```
-
-To publish the configuration file, run:
-
-```bash
-cp vendor/elminson/db-logger/src/config/database-logger.php config/db-logger.php
 ```
 
 ## Usage
