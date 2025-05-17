@@ -1,6 +1,6 @@
 <?php
 
-namespace Elminson\DQL;
+namespace Elminson\DbLogger;
 
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder;
