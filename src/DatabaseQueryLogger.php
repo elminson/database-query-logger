@@ -40,11 +40,11 @@ class DatabaseQueryLogger
         }
 
         $directory = dirname($this->logFile);
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             mkdir($directory, 0755, true);
         }
 
-        if (!file_exists($this->logFile)) {
+        if (! file_exists($this->logFile)) {
             touch($this->logFile);
             chmod($this->logFile, 0666);
         }

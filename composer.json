@@ -1,5 +1,5 @@
 {
-    "name": "elminson/db-logger",
+    "name": "elminson/database-query-logger",
     "description": "A powerful PHP package for logging SQL queries from Laravel applications, supporting both Eloquent and Query Builder instances, with flexible output options.",
     "type": "library",
     "license": "MIT",
