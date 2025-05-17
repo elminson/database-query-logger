@@ -32,6 +32,7 @@ class DatabaseQueryLogger
     /**
      * Set the log file path for query logging.
      *
+     * @param string|null $filePath
      * @return $this
      */
     public function setLogFile(?string $filePath): self
@@ -45,6 +46,7 @@ class DatabaseQueryLogger
     /**
      * Enable or disable console output for query logging.
      *
+     * @param bool $enable
      * @return $this
      */
     public function enableConsoleOutput(bool $enable = true): self
@@ -57,6 +59,7 @@ class DatabaseQueryLogger
     /**
      * Enable or disable the logger completely.
      *
+     * @param bool $enable
      * @return $this
      */
     public function enable(bool $enable = true): self
@@ -69,8 +72,10 @@ class DatabaseQueryLogger
     /**
      * Log SQL queries for both Query Builder and raw PDO statements.
      *
-     * @param  Builder|QueryBuilder|PDOStatement|string  $query
-     *
+     * @param Builder|QueryBuilder|PDOStatement|string $query
+     * @param array $bindings
+     * @param ConnectionInterface|null $connection
+     * @return string The formatted SQL query
      * @throws \Exception
      */
     public function logQuery($query, array $bindings = [], ?ConnectionInterface $connection = null): string

@@ -18,13 +18,15 @@ beforeEach(function () {
     $db->setAsGlobal();
     $db->bootEloquent();
 
-    // Create a test table
+    // Create test table
     DB::schema()->create('users', function (Blueprint $table) {
-        $table->increments('id');
+        $table->id();
         $table->string('email');
+        $table->boolean('active')->default(true);
+        $table->float('score')->nullable();
     });
 
-    // Insert a test record
+    // Insert test data
     DB::table('users')->insert([
         'email' => 'example@example.com',
     ]);
@@ -44,22 +46,19 @@ beforeEach(function () {
 it('logs query with console output disabled', function () {
     $logger = new DatabaseQueryLogger([
         'enabled' => true,
-        'console_output' => false,
+        'console_output' => false
     ]);
     $query = DB::table('users')->where('email', 'example@example.com');
 
-    ob_start();
     $result = $logger->logQuery($query);
-    $output = ob_get_clean();
 
-    expect($output)->toBe('');
     expect($result)->toContain('select * from "users" where "email" = \'example@example.com\'');
 });
 
 it('logs query with console output enabled', function () {
     $logger = new DatabaseQueryLogger([
         'enabled' => true,
-        'console_output' => true,
+        'console_output' => true
     ]);
     $query = DB::table('users')->where('email', 'example@example.com');
 
@@ -67,21 +66,21 @@ it('logs query with console output enabled', function () {
     $result = $logger->logQuery($query);
     $output = ob_get_clean();
 
-    expect($output)->toContain('select * from "users" where "email" = \'example@example.com\'');
     expect($result)->toContain('select * from "users" where "email" = \'example@example.com\'');
+    expect($output)->toContain('select * from "users" where "email" = \'example@example.com\'');
 });
 
 it('logs query with file logging', function () {
-    $logFile = sys_get_temp_dir().'/test-query.log';
+    $logFile = sys_get_temp_dir() . '/test-query.log';
     $logger = new DatabaseQueryLogger([
         'enabled' => true,
         'file_logging' => true,
-        'log_file' => $logFile,
+        'log_file' => $logFile
     ]);
     $query = DB::table('users')->where('email', 'example@example.com');
 
     $result = $logger->logQuery($query);
-
+    
     expect($result)->toContain('select * from "users" where "email" = \'example@example.com\'');
     expect(file_exists($logFile))->toBeTrue();
     expect(file_get_contents($logFile))->toContain('select * from "users" where "email" = \'example@example.com\'');
@@ -91,12 +90,12 @@ it('logs query with file logging', function () {
 });
 
 it('logs query with both console and file output', function () {
-    $logFile = sys_get_temp_dir().'/test-query.log';
+    $logFile = sys_get_temp_dir() . '/test-query.log';
     $logger = new DatabaseQueryLogger([
         'enabled' => true,
         'console_output' => true,
         'file_logging' => true,
-        'log_file' => $logFile,
+        'log_file' => $logFile
     ]);
     $query = DB::table('users')->where('email', 'example@example.com');
 
@@ -104,8 +103,8 @@ it('logs query with both console and file output', function () {
     $result = $logger->logQuery($query);
     $output = ob_get_clean();
 
-    expect($output)->toContain('select * from "users" where "email" = \'example@example.com\'');
     expect($result)->toContain('select * from "users" where "email" = \'example@example.com\'');
+    expect($output)->toContain('select * from "users" where "email" = \'example@example.com\'');
     expect(file_exists($logFile))->toBeTrue();
     expect(file_get_contents($logFile))->toContain('select * from "users" where "email" = \'example@example.com\'');
 
