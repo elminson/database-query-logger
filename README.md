@@ -1,8 +1,8 @@
 # Database Query Logger
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/elminson/db-logger.svg?style=flat-square)](https://packagist.org/packages/elminson/db-logger)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/elminson/database-query-logger.svg?style=flat-square)](https://packagist.org/packages/elminson/database-query-logger)
 [![Tests](https://img.shields.io/github/actions/workflow/status/elminson/db-logger/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/elminson/db-logger/actions/workflows/run-tests.yml)
-[![Total Downloads](https://img.shields.io/packagist/dt/elminson/db-logger.svg?style=flat-square)](https://packagist.org/packages/elminson/db-logger)
+[![Total Downloads](https://img.shields.io/packagist/dt/elminson/database-query-logger.svg?style=flat-square)](https://packagist.org/packages/elminson/database-query-logger)
 
 A powerful PHP package for logging SQL queries from Laravel applications, supporting both Eloquent and Query Builder instances, with flexible output options.
 
@@ -43,7 +43,7 @@ DB_LOGGER_FILE_PATH=storage/logs/queries.log
 Copy the configuration file to your Laravel project:
 
 ```bash
-cp vendor/elminson/db-logger/src/config/database-logger.php config/db-logger.php
+cp vendor/elminson/database-query-logger/src/config/database-logger.php config/db-logger.php
 ```
 
 ### Service Provider
@@ -53,7 +53,7 @@ Register the service provider in `config/app.php`:
 ```php
 'providers' => [
     // ...
-    Elminson\DQL\DatabaseQueryLoggerServiceProvider::class,
+    App\Providers\DatabaseQueryLoggerServiceProvider::class,
 ],
 ```
 
@@ -62,7 +62,7 @@ Register the service provider in `config/app.php`:
 ### Basic Usage
 
 ```php
-use Elminson\DQL\DatabaseQueryLogger;
+use Elminson\DbLogger\DatabaseQueryLogger;
 use Illuminate\Database\Capsule\Manager as DB;
 
 // Initialize the logger
@@ -145,7 +145,7 @@ To log every SQL query executed by your Laravel application, add the following t
 
 ```php
 use Illuminate\Support\Facades\DB;
-use Elminson\DQL\DatabaseQueryLogger;
+use Elminson\DbLogger\DatabaseQueryLogger;
 
 public function boot()
 {
