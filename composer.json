@@ -3,7 +3,7 @@
     "description": "A powerful PHP package for logging SQL queries from Laravel applications, supporting both Eloquent and Query Builder instances, with flexible output options.",
     "type": "library",
     "license": "MIT",
-    "version": "1.1.7",
+    "version": "1.1.12",
     "authors": [
         {
             "name": "Elminson Deoleo",
