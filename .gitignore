@@ -37,3 +37,5 @@ testbench.yaml
 .vscode
 *.swp*
 .DS_Store
+.aider.*
+.gitmessage
