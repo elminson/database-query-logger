@@ -27,4 +27,4 @@ class DatabaseQueryLoggerServiceProvider extends ServiceProvider
             __DIR__.'/config/database-logger.php', 'db-logger'
         );
     }
-} 
+}

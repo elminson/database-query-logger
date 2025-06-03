@@ -18,7 +18,7 @@ class DatabaseQueryLoggerTest extends TestCase
     {
         parent::setUp();
         $this->logger = new DatabaseQueryLogger;
-        $this->testLogFile = sys_get_temp_dir() . '/test-database-queries.log';
+        $this->testLogFile = sys_get_temp_dir().'/test-database-queries.log';
 
         // Clean up any existing test log file
         if (file_exists($this->testLogFile)) {
@@ -103,7 +103,7 @@ class DatabaseQueryLoggerTest extends TestCase
 
     public function test_log_file_directory_creation()
     {
-        $nestedLogFile = sys_get_temp_dir() . '/nested/dir/test-database-queries.log';
+        $nestedLogFile = sys_get_temp_dir().'/nested/dir/test-database-queries.log';
         $this->logger->enable(true);
         $this->logger->setLogFile($nestedLogFile);
 
@@ -162,7 +162,7 @@ class DatabaseQueryLoggerTest extends TestCase
 
     public function test_json_log_format()
     {
-        $logger = new  DatabaseQueryLogger([ // Changed namespace
+        $logger = new DatabaseQueryLogger([ // Changed namespace
             'enabled' => true,
             'file_logging' => true,
             'log_file' => $this->testLogFile,
@@ -187,12 +187,12 @@ class DatabaseQueryLoggerTest extends TestCase
     public function test_log_rotation_daily()
     {
         $baseLogFileName = 'test-rotation.log';
-        $this->testLogFile = sys_get_temp_dir() . '/' . $baseLogFileName;
+        $this->testLogFile = sys_get_temp_dir().'/'.$baseLogFileName;
         $fileInfo = pathinfo($this->testLogFile);
         $logDir = $fileInfo['dirname'];
 
         // Elimina logs anteriores de pruebas previas
-        foreach (glob($logDir . '/' . $fileInfo['filename'] . '*') as $file) {
+        foreach (glob($logDir.'/'.$fileInfo['filename'].'*') as $file) {
             unlink($file);
         }
 
@@ -218,7 +218,7 @@ class DatabaseQueryLoggerTest extends TestCase
         touch($this->testLogFile, $yesterday);
         $logger->logQuery($query); // Rotación ocurre aquí
 
-        $rotatedFile1Name = $logDir . '/' . $fileInfo['filename'] . '-' . date('Y-m-d', $yesterday) . '.' . $fileInfo['extension'];
+        $rotatedFile1Name = $logDir.'/'.$fileInfo['filename'].'-'.date('Y-m-d', $yesterday).'.'.$fileInfo['extension'];
         $this->assertFileExists($rotatedFile1Name);
         $this->assertFileExists($this->testLogFile);
         $this->assertStringContainsString('SELECT * FROM users', file_get_contents($this->testLogFile));
@@ -229,7 +229,7 @@ class DatabaseQueryLoggerTest extends TestCase
         touch($this->testLogFile, $yesterday);
         $logger->logQuery($query);
 
-        $rotatedFile2Name = $logDir . '/' . $fileInfo['filename'] . '-' . date('Y-m-d', $yesterday) . '.' . $fileInfo['extension'];
+        $rotatedFile2Name = $logDir.'/'.$fileInfo['filename'].'-'.date('Y-m-d', $yesterday).'.'.$fileInfo['extension'];
         $this->assertFileExists($rotatedFile2Name);
         $this->assertFileExists($this->testLogFile);
 
@@ -237,18 +237,18 @@ class DatabaseQueryLoggerTest extends TestCase
         touch($this->testLogFile, $yesterday);
         $logger->logQuery($query);
 
-        $rotatedFile3Name = $logDir . '/' . $fileInfo['filename'] . '-' . date('Y-m-d', $yesterday) . '.' . $fileInfo['extension'];
+        $rotatedFile3Name = $logDir.'/'.$fileInfo['filename'].'-'.date('Y-m-d', $yesterday).'.'.$fileInfo['extension'];
         $this->assertFileExists($rotatedFile3Name);
 
         // Verify that only the 2 most recent log files are kept
-        $actualLogFiles = glob($logDir . '/' . $fileInfo['filename'] . '-*.' . $fileInfo['extension']);
+        $actualLogFiles = glob($logDir.'/'.$fileInfo['filename'].'-*.'.$fileInfo['extension']);
         $this->assertCount(2, $actualLogFiles);
 
-        $originalRotatedFile1Name = $logDir . '/' . $fileInfo['filename'] . '-' . date('Y-m-d', $dayBeforeYesterday) . '.' . $fileInfo['extension'];
+        $originalRotatedFile1Name = $logDir.'/'.$fileInfo['filename'].'-'.date('Y-m-d', $dayBeforeYesterday).'.'.$fileInfo['extension'];
         $this->assertFileDoesNotExist($originalRotatedFile1Name);
 
         // Final cleanup
-        foreach (glob($logDir . '/' . $fileInfo['filename'] . '*') as $file) {
+        foreach (glob($logDir.'/'.$fileInfo['filename'].'*') as $file) {
             unlink($file);
         }
     }
