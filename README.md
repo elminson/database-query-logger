@@ -67,13 +67,15 @@ Here are the available options:
 - `log_rotation_max_files` (integer): Maximum number of rotated log files to keep. Default: `7`.
   - Env: `DB_LOGGER_ROTATION_MAX_FILES`
 
-### Manual Configuration
+### Publishing the Configuration File
 
-Copy the configuration file to your Laravel project:
+If you want to customize the logger configuration, you can publish the config file to your Laravel project using the following Artisan command:
 
 ```bash
-cp vendor/elminson/database-query-logger/src/config/database-logger.php config/db-logger.php
+php artisan vendor:publish --provider="Elminson\\DbLogger\\DatabaseQueryLoggerServiceProvider" --tag=config
 ```
+
+This will copy the configuration file to `config/db-logger.php` in your Laravel application, where you can adjust the settings as needed.
 
 ### Service Provider
 

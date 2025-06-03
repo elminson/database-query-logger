@@ -45,5 +45,12 @@
             "pestphp/pest-plugin": true
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Elminson\\DbLogger\\DatabaseQueryLoggerServiceProvider"
+            ]
+        }
+    }
 }
