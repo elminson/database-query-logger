@@ -1,6 +1,6 @@
 <?php
 
-use Elminson\DQL\DatabaseQueryLogger;
+use Elminson\DbLogger\DatabaseQueryLogger;
 
 if (! function_exists('log_query')) {
     /**

@@ -24,6 +24,8 @@ composer require elminson/database-query-logger
 - [x] Timestamp-based log entries
 - [x] Automatic directory creation for log files
 - [x] Support for different parameter types (string, integer, boolean, null)
+- [x] JSON log formatting
+- [x] Log rotation (daily/weekly, max files)
 
 ## Configuration
 
@@ -36,7 +38,34 @@ DB_LOGGER_ENABLED=true
 DB_LOGGER_CONSOLE_OUTPUT=true
 DB_LOGGER_FILE_LOGGING=true
 DB_LOGGER_FILE_PATH=storage/logs/queries.log
+DB_LOGGER_LOG_FORMAT=text # or json
+DB_LOGGER_ROTATION_ENABLED=false
+DB_LOGGER_ROTATION_PERIOD=daily # or weekly
+DB_LOGGER_ROTATION_MAX_FILES=7
 ```
+
+### Configuration Options
+
+The logger can be configured using environment variables (as shown above) or by passing an array to its constructor. If you publish the configuration file (`config/db-logger.php`), you can manage these settings there.
+
+Here are the available options:
+
+- `enabled` (boolean): Enable or disable the logger completely. Default: `false`.
+  - Env: `DB_LOGGER_ENABLED`
+- `console_output` (boolean): Enable or disable console output. Default: `false`.
+  - Env: `DB_LOGGER_CONSOLE_OUTPUT`
+- `file_logging` (boolean): Enable or disable file logging. Default: `false`.
+  - Env: `DB_LOGGER_FILE_LOGGING`
+- `log_file` (string): Path to the log file. Default: `storage_path('logs/database-queries.log')`.
+  - Env: `DB_LOGGER_FILE_PATH`
+- `log_format` (string): Log format. Possible values: `text`, `json`. Default: `text`.
+  - Env: `DB_LOGGER_LOG_FORMAT`
+- `log_rotation_enabled` (boolean): Enable or disable log rotation. Default: `false`.
+  - Env: `DB_LOGGER_ROTATION_ENABLED`
+- `log_rotation_period` (string): Log rotation period. Possible values: `daily`, `weekly`. Default: `daily`.
+  - Env: `DB_LOGGER_ROTATION_PERIOD`
+- `log_rotation_max_files` (integer): Maximum number of rotated log files to keep. Default: `7`.
+  - Env: `DB_LOGGER_ROTATION_MAX_FILES`
 
 ### Manual Configuration
 
@@ -70,7 +99,11 @@ $logger = new DatabaseQueryLogger([
     'enabled' => true,
     'console_output' => true,
     'file_logging' => true,
-    'log_file' => storage_path('logs/queries.log')
+    'log_file' => storage_path('logs/queries.log'),
+    'log_format' => 'text',   // or 'json'
+    'log_rotation_enabled' => false, // or true
+    'log_rotation_period' => 'daily', // or 'weekly'
+    'log_rotation_max_files' => 7
 ]);
 
 // Log a query
