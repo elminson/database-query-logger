@@ -2,12 +2,11 @@
 
 namespace Elminson\DbLogger;
 
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use PDO;
 use PDOStatement;
-use Elminson\DbLogger\PDOStatementWrapper;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class DatabaseQueryLogger
 {
@@ -142,9 +141,9 @@ class DatabaseQueryLogger
         $timestamp = date('Y-m-d H:i:s');
 
         if ($this->logFormat === 'json') {
-            $logEntry = json_encode(['timestamp' => $timestamp, 'query' => $query]) . PHP_EOL;
+            $logEntry = json_encode(['timestamp' => $timestamp, 'query' => $query]).PHP_EOL;
         } else {
-            $logEntry = "[{$timestamp}] {$query}" . PHP_EOL;
+            $logEntry = "[{$timestamp}] {$query}".PHP_EOL;
         }
 
         if ($this->consoleOutput && PHP_SAPI === 'cli') {
@@ -187,11 +186,11 @@ class DatabaseQueryLogger
 
         // Rotate if the date suffix of the file is different from the expected current suffix
         if ($currentFileDateSuffix !== $expectedSuffix) {
-            $rotatedFilename = $fileInfo['dirname'] . '/' . $fileInfo['filename'] . '-' . $currentFileDateSuffix . '.' . $fileInfo['extension'];
+            $rotatedFilename = $fileInfo['dirname'].'/'.$fileInfo['filename'].'-'.$currentFileDateSuffix.'.'.$fileInfo['extension'];
 
             // Ensure the target directory for rotated file exists
             $rotatedFileDir = dirname($rotatedFilename);
-            if (!is_dir($rotatedFileDir)) {
+            if (! is_dir($rotatedFileDir)) {
                 mkdir($rotatedFileDir, 0755, true);
             }
 
@@ -201,7 +200,7 @@ class DatabaseQueryLogger
             }
 
             // Manage max files
-            $logFiles = glob($fileInfo['dirname'] . '/' . $fileInfo['filename'] . '-*.' . $fileInfo['extension']);
+            $logFiles = glob($fileInfo['dirname'].'/'.$fileInfo['filename'].'-*.'.$fileInfo['extension']);
             if (count($logFiles) > $this->logRotationMaxFiles) {
                 usort($logFiles, function ($a, $b) {
                     return filemtime($a) - filemtime($b);
@@ -273,14 +272,14 @@ class DatabaseQueryLogger
             return $sql;
         }
         // Debug: print SQL and bindings before replacement
-        file_put_contents('php://stderr', "FORMATQUERY BEFORE: sql=[$sql], bindings=" . var_export($bindings, true) . "\n");
+        file_put_contents('php://stderr', "FORMATQUERY BEFORE: sql=[$sql], bindings=".var_export($bindings, true)."\n");
 
         // If there are named parameters (e.g., :email), replace them
         if (preg_match('/:[a-zA-Z_][a-zA-Z0-9_]*/', $sql)) {
             foreach ($bindings as $key => $value) {
                 $replace = is_numeric($value) ? $value : (is_bool($value) ? ($value ? '1' : '0') : (is_null($value) ? 'NULL' : "'{$value}'"));
                 // Ensure the key starts with a colon
-                $param = (str_starts_with($key, ':')) ? $key : (':' . $key);
+                $param = (str_starts_with($key, ':')) ? $key : (':'.$key);
                 $sql = str_replace($param, $replace, $sql);
             }
             // Normalize whitespace
