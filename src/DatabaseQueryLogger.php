@@ -133,13 +133,13 @@ class DatabaseQueryLogger
         }
 
         if ($this->fileLogging && $this->logFile !== null) {
-			try {
-				$directory = dirname($this->logFile);
-			} catch (\Exception $e) {
-				// Handle the exception if needed
-				$directory = '/tmp'; // Fallback to a default directory
-			}
-			if (! is_dir($directory)) {
+            try {
+                $directory = dirname($this->logFile);
+            } catch (\Exception $e) {
+                // Handle the exception if needed
+                $directory = '/tmp'; // Fallback to a default directory
+            }
+            if (! is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }
             file_put_contents($this->logFile, $logEntry, FILE_APPEND);
