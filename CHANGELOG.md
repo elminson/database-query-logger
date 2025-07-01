@@ -2,6 +2,18 @@
 
 All notable changes to `db-logger` will be documented in this file.
 
+## v1.3.0 - 2025-07-01
+
+### What's Changed
+
+* Simple change to update composer to support laravel 12 by @masterfermin02 in https://github.com/elminson/database-query-logger/pull/8
+
+### New Contributors
+
+* @masterfermin02 made their first contribution in https://github.com/elminson/database-query-logger/pull/8
+
+**Full Changelog**: https://github.com/elminson/database-query-logger/compare/v1.2.0...v1.3.0
+
 ## v1.2.0 - 2025-07-01
 
 ### What's Changed
@@ -36,6 +48,7 @@ All notable changes to `db-logger` will be documented in this file.
   DB_LOGGER_FILE_PATH=storage/logs/queries.log
   
   
+  
   ```
 - Added service provider for easy integration
 - Implemented flexible configuration options
@@ -56,6 +69,7 @@ $query = DB::table('users')->where('email', 'example@example.com');
 $logger->logQuery($query);
 
 
+
 ```
 ##### PDO Statement Logging
 
@@ -65,6 +79,7 @@ $stmt->bindParam(':email', 'example@example.com');
 $logger->logQuery($stmt, ['example@example.com']);
 
 
+
 ```
 ##### Configuration Methods
 
@@ -72,6 +87,7 @@ $logger->logQuery($stmt, ['example@example.com']);
 $logger->enable(true);
 $logger->enableConsoleOutput(true);
 $logger->setLogFile(storage_path('logs/queries.log'));
+
 
 
 ```
