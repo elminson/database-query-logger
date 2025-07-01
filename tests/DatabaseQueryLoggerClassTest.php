@@ -3,7 +3,7 @@
 // @codeCoverageIgnore
 
 use Elminson\DbLogger\DatabaseQueryLogger;
-use Elminson\DQL\PDOStatementWrapper;
+use Elminson\DbLogger\PDOStatementWrapper;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
 use PDO;

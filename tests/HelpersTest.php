@@ -1,6 +1,6 @@
 <?php
 
-namespace Elminson\DQL\Tests;
+namespace Elminson\DbLogger\Tests;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;

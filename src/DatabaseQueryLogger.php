@@ -2,7 +2,6 @@
 
 namespace Elminson\DbLogger;
 
-use Elminson\DQL\PDOStatementWrapper;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -147,8 +146,8 @@ class DatabaseQueryLogger
             $logEntry = "[{$timestamp}] {$query}".PHP_EOL;
         }
 
-        if ($this->consoleOutput) {
-            // echo $logEntry;
+        if ($this->consoleOutput && PHP_SAPI === 'cli') {
+            echo $logEntry;
         }
 
         if ($this->fileLogging && $this->logFile !== null) {
