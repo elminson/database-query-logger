@@ -2,7 +2,7 @@
 
 // @codeCoverageIgnore
 
-use Elminson\DQL\DatabaseQueryLogger;
+use Elminson\DbLogger\DatabaseQueryLogger;
 use Elminson\DQL\PDOStatementWrapper;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;

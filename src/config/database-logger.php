@@ -22,4 +22,16 @@ return [
 
     // Enable or disable the logger completely
     'enabled' => env('DB_LOGGER_ENABLED', false),
+
+    // Log format ('text' or 'json')
+    'log_format' => env('DB_LOGGER_LOG_FORMAT', 'text'),
+
+    // Enable or disable log rotation
+    'log_rotation_enabled' => env('DB_LOGGER_ROTATION_ENABLED', false),
+
+    // Log rotation period ('daily', 'weekly')
+    'log_rotation_period' => env('DB_LOGGER_ROTATION_PERIOD', 'daily'),
+
+    // Maximum number of rotated log files to keep
+    'log_rotation_max_files' => env('DB_LOGGER_ROTATION_MAX_FILES', 7),
 ];

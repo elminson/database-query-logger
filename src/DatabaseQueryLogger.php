@@ -2,11 +2,12 @@
 
 namespace Elminson\DbLogger;
 
-use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use PDO;
 use PDOStatement;
+use Elminson\DQL\PDOStatementWrapper;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class DatabaseQueryLogger
 {
@@ -18,11 +19,24 @@ class DatabaseQueryLogger
 
     private bool $fileLogging = false;
 
+    private string $logFormat = 'text'; // Default to text
+
+    private bool $logRotationEnabled = false;
+
+    private string $logRotationPeriod = 'daily';
+
+    private int $logRotationMaxFiles = 7;
+
     public function __construct(array $config = [])
     {
         $this->enabled = $config['enabled'] ?? false;
         $this->consoleOutput = $config['console_output'] ?? false;
         $this->fileLogging = $config['file_logging'] ?? false;
+        $this->logFormat = $config['log_format'] ?? 'text';
+
+        $this->logRotationEnabled = $config['log_rotation_enabled'] ?? false;
+        $this->logRotationPeriod = $config['log_rotation_period'] ?? 'daily';
+        $this->logRotationMaxFiles = $config['log_rotation_max_files'] ?? 7;
 
         if ($this->fileLogging) {
             $this->logFile = $config['log_file'] ?? null;
@@ -126,18 +140,79 @@ class DatabaseQueryLogger
     private function writeLog(string $query): void
     {
         $timestamp = date('Y-m-d H:i:s');
-        $logEntry = "[{$timestamp}] {$query}".PHP_EOL;
+
+        if ($this->logFormat === 'json') {
+            $logEntry = json_encode(['timestamp' => $timestamp, 'query' => $query]) . PHP_EOL;
+        } else {
+            $logEntry = "[{$timestamp}] {$query}" . PHP_EOL;
+        }
 
         if ($this->consoleOutput) {
-            echo $logEntry;
+            // echo $logEntry;
         }
 
         if ($this->fileLogging && $this->logFile !== null) {
-            $directory = dirname($this->logFile);
-            if (! is_dir($directory)) {
-                mkdir($directory, 0755, true);
+            $this->ensureLogFileExists(); // Ensure base log file and directory exist
+
+            if ($this->logRotationEnabled) {
+                $this->rotateLogFile();
             }
+
             file_put_contents($this->logFile, $logEntry, FILE_APPEND);
+        }
+    }
+
+    /**
+     * Rotate the log file if necessary.
+     */
+    private function rotateLogFile(): void
+    {
+        if (! $this->logFile || ! file_exists($this->logFile)) {
+            return;
+        }
+
+        $fileInfo = pathinfo($this->logFile);
+        $currentFileDateSuffix = '';
+
+        if ($this->logRotationPeriod === 'daily') {
+            $currentFileDateSuffix = date('Y-m-d', filemtime($this->logFile));
+            $expectedSuffix = date('Y-m-d');
+        } elseif ($this->logRotationPeriod === 'weekly') {
+            $currentFileDateSuffix = date('Y-W', filemtime($this->logFile));
+            $expectedSuffix = date('Y-W');
+        } else {
+            // Unsupported period, do not rotate by date
+            return;
+        }
+
+        // Rotate if the date suffix of the file is different from the expected current suffix
+        if ($currentFileDateSuffix !== $expectedSuffix) {
+            $rotatedFilename = $fileInfo['dirname'] . '/' . $fileInfo['filename'] . '-' . $currentFileDateSuffix . '.' . $fileInfo['extension'];
+
+            // Ensure the target directory for rotated file exists
+            $rotatedFileDir = dirname($rotatedFilename);
+            if (!is_dir($rotatedFileDir)) {
+                mkdir($rotatedFileDir, 0755, true);
+            }
+
+            if (rename($this->logFile, $rotatedFilename)) {
+                touch($this->logFile); // Create new empty log file
+                chmod($this->logFile, 0666);
+            }
+
+            // Manage max files
+            $logFiles = glob($fileInfo['dirname'] . '/' . $fileInfo['filename'] . '-*.' . $fileInfo['extension']);
+            if (count($logFiles) > $this->logRotationMaxFiles) {
+                usort($logFiles, function ($a, $b) {
+                    return filemtime($a) - filemtime($b);
+                });
+                $filesToDelete = count($logFiles) - $this->logRotationMaxFiles;
+                for ($i = 0; $i < $filesToDelete; $i++) {
+                    if (file_exists($logFiles[$i])) {
+                        unlink($logFiles[$i]);
+                    }
+                }
+            }
         }
     }
 
@@ -198,14 +273,14 @@ class DatabaseQueryLogger
             return $sql;
         }
         // Debug: print SQL and bindings before replacement
-        file_put_contents('php://stderr', "FORMATQUERY BEFORE: sql=[$sql], bindings=".var_export($bindings, true)."\n");
+        file_put_contents('php://stderr', "FORMATQUERY BEFORE: sql=[$sql], bindings=" . var_export($bindings, true) . "\n");
 
         // If there are named parameters (e.g., :email), replace them
         if (preg_match('/:[a-zA-Z_][a-zA-Z0-9_]*/', $sql)) {
             foreach ($bindings as $key => $value) {
                 $replace = is_numeric($value) ? $value : (is_bool($value) ? ($value ? '1' : '0') : (is_null($value) ? 'NULL' : "'{$value}'"));
                 // Ensure the key starts with a colon
-                $param = (str_starts_with($key, ':')) ? $key : (':'.$key);
+                $param = (str_starts_with($key, ':')) ? $key : (':' . $key);
                 $sql = str_replace($param, $replace, $sql);
             }
             // Normalize whitespace
