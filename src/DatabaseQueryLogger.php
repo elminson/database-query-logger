@@ -2,8 +2,6 @@
 
 namespace Elminson\DbLogger;
 
-use Elminson\DbLogger\PDOStatementWrapper;
-
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
