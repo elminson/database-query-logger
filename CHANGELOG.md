@@ -2,6 +2,19 @@
 
 All notable changes to `db-logger` will be documented in this file.
 
+## v1.2.0 - 2025-07-01
+
+### What's Changed
+
+* Add JSON logging format and automatic log rotation features by @ivanmercedes in https://github.com/elminson/database-query-logger/pull/5
+* Feature/vendor publish support by @elminson in https://github.com/elminson/database-query-logger/pull/6
+
+### New Contributors
+
+* @ivanmercedes made their first contribution in https://github.com/elminson/database-query-logger/pull/5
+
+**Full Changelog**: https://github.com/elminson/database-query-logger/compare/v1.1.12...v1.2.0
+
 ## 1.0.1 - 2025-05-17
 
 ### Release Notes v1.0.0
@@ -22,6 +35,7 @@ All notable changes to `db-logger` will be documented in this file.
   DB_LOGGER_FILE_LOGGING=true
   DB_LOGGER_FILE_PATH=storage/logs/queries.log
   
+  
   ```
 - Added service provider for easy integration
 - Implemented flexible configuration options
@@ -41,6 +55,7 @@ $logger = new DatabaseQueryLogger([
 $query = DB::table('users')->where('email', 'example@example.com');
 $logger->logQuery($query);
 
+
 ```
 ##### PDO Statement Logging
 
@@ -49,6 +64,7 @@ $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email');
 $stmt->bindParam(':email', 'example@example.com');
 $logger->logQuery($stmt, ['example@example.com']);
 
+
 ```
 ##### Configuration Methods
 
@@ -56,6 +72,7 @@ $logger->logQuery($stmt, ['example@example.com']);
 $logger->enable(true);
 $logger->enableConsoleOutput(true);
 $logger->setLogFile(storage_path('logs/queries.log'));
+
 
 ```
 #### Enhancements
