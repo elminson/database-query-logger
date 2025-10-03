@@ -271,22 +271,20 @@ class DatabaseQueryLogger
         if ($sql === 'No query string available for this PDOStatement') {
             return $sql;
         }
-        // Debug: print SQL and bindings before replacement
-        file_put_contents('php://stderr', "FORMATQUERY BEFORE: sql=[$sql], bindings=".var_export($bindings, true)."\n");
 
         // If there are named parameters (e.g., :email), replace them
         if (preg_match('/:[a-zA-Z_][a-zA-Z0-9_]*/', $sql)) {
+            $replacements = [];
             foreach ($bindings as $key => $value) {
                 $replace = is_numeric($value) ? $value : (is_bool($value) ? ($value ? '1' : '0') : (is_null($value) ? 'NULL' : "'{$value}'"));
                 // Ensure the key starts with a colon
-                $param = (str_starts_with($key, ':')) ? $key : (':'.$key);
-                $sql = str_replace($param, $replace, $sql);
+                $param = str_starts_with((string) $key, ':') ? $key : (':'.$key);
+                $replacements[$param] = $replace;
             }
+            $sql = strtr($sql, $replacements);
             // Normalize whitespace
             $sql = preg_replace('/\s+/', ' ', $sql);
             $sql = trim($sql);
-            // Debug: print SQL after replacement
-            file_put_contents('php://stderr', "FORMATQUERY AFTER: sql=[$sql]\n");
 
             return $sql;
         }
@@ -310,8 +308,6 @@ class DatabaseQueryLogger
         // Normalize whitespace
         $sql = preg_replace('/\s+/', ' ', $sql);
         $sql = trim($sql);
-        // Debug: print SQL after replacement
-        file_put_contents('php://stderr', "FORMATQUERY AFTER: sql=[$sql]\n");
 
         return $sql;
     }
