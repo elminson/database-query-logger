@@ -270,4 +270,22 @@ class DatabaseQueryLoggerTest extends TestCase
 
         return $query;
     }
+
+    public function test_named_parameter_replacement_is_not_greedy()
+    {
+        $this->logger->enable(true);
+        $sql = 'UPDATE users SET email = :new_email WHERE email = :old_email';
+        $bindings = [
+            'new_email' => 'foo@bar.com',
+            'old_email' => ':new_email', // This value should not be replaced
+        ];
+
+        $query = Mockery::mock(Builder::class);
+        $query->shouldReceive('toSql')->andReturn($sql);
+        $query->shouldReceive('getBindings')->andReturn($bindings);
+
+        $result = $this->logger->logQuery($query);
+        $expected = "UPDATE users SET email = 'foo@bar.com' WHERE email = ':new_email'";
+        $this->assertEquals($expected, $result);
+    }
 }
